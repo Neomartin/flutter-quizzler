@@ -2,7 +2,5 @@ class Question {
   String question;
   bool answer;
 
-  Question({q, a}) :
-    question = q,
-    answer = a;
+  Question({required this.question, required this.answer});
 }

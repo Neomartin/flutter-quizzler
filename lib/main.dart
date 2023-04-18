@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizzler/question.dart';
 import 'question_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 QuizBrain quizBrain = QuizBrain();
 
@@ -32,7 +33,28 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   List<Widget> scoreKeeper = [];
-
+  _alert(context) {
+    Alert(
+        type: AlertType.info,
+        context: context,
+        title: "TERMINO EL QUIZZ",
+        desc: "Felicitaciones has completado el Quiz! Ni idea de como has salido "
+              "pq no voy a programar esa parte pero se te enviará un ramo de rosas y una cartita de feliz cumpleaños.",
+        buttons: [
+          DialogButton(
+              onPressed: () => resetQuiz(context),
+              gradient: const LinearGradient(colors: [
+                Color.fromRGBO(116, 116, 191, 1.0),
+                Color.fromRGBO(52, 138, 199, 1.0),
+              ]),
+              child: const Text(
+                "Terminar",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+          )
+        ],
+    ).show();
+  }
   // List<String> questions = [
   //   'You can lead a cow down stairs but not up stairs.',
   //   'Approximately one quarter of human bones are in the feet.',
@@ -45,24 +67,26 @@ class _QuizPageState extends State<QuizPage> {
   //   true,
   // ];
   void answerCheck(bool a) {
-    if (quizBrain.q[questionNumber].answer == a) {
+    if (quizBrain.getQuestionAnswer() == a) {
+
       scoreKeeper.add(
         const Icon(color: Colors.green, Icons.check),
       );
     } else {
       scoreKeeper.add(const Icon(color: Colors.red, Icons.close));
     }
-    questionNumber < quizBrain.q.length -1 ? questionNumber++ : resetQuiz();
+    quizBrain.nextQuestion() ? null : _alert(context);
+    // questionNumber < quizBrain.getQuestionsLength() -1 ? questionNumber++ : resetQuiz();
   }
 
-  void resetQuiz() {
+  void resetQuiz(context) {
     setState(() {
       scoreKeeper = [];
-      questionNumber = 0;
+      quizBrain.resetQuestionQuiz();
     });
+    Navigator.of(context).pop();
   }
 
-  int questionNumber = 0;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -75,7 +99,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: const EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                quizBrain.q[questionNumber].question,
+                quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
